@@ -1,28 +1,51 @@
 #include "../exercise.h"
-
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
 // READ: 复制构造函数 <https://zh.cppreference.com/w/cpp/language/copy_constructor>
 // READ: 函数定义（显式弃置）<https://zh.cppreference.com/w/cpp/language/function>
 
 
 class DynFibonacci {
-    size_t *cache;
-    int cached;
-
 public:
+    int cached;
+    int capacity;
+    size_t *cache = nullptr;
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity){
+        cache = new size_t[capacity];
+        memset(cache, 0, sizeof(size_t) * capacity);
+        cache[0] = 0;
+        cache[1] = 1;
+        cached = 2;
+        this->capacity=capacity;
+    }
 
     // TODO: 实现复制构造器
-    DynFibonacci(DynFibonacci const &) = delete;
+    DynFibonacci(DynFibonacci const & fbi){
+       this->cache = new size_t[fbi.capacity];
+       memset(this->cache, 0, sizeof(size_t) * fbi.capacity);
+       memcpy((void *)this->cache, (void *)fbi.cache, fbi.capacity*sizeof(size_t));
+       this->capacity=fbi.capacity;
+       this->cached = fbi.cached;
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci(){
+         delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t get(int i) {
-        for (; false; ++cached) {
-            cache[cached] = cache[cached - 1] + cache[cached - 2];
+        if (i <= cached)
+            return cache[i];
+
+        for (int j = 2; j <= i; ++j) {
+            if (cache[j] != 0)
+                continue;
+            cache[j] = cache[j - 1] + cache[j - 2];
         }
+        this->cached = i;
         return cache[i];
     }
 

@@ -1,4 +1,5 @@
 #include "../exercise.h"
+#include <cstring>
 
 // READ: 析构函数 <https://zh.cppreference.com/w/cpp/language/destructor>
 // READ: RAII <https://learn.microsoft.com/zh-cn/cpp/cpp/object-lifetime-and-resource-management-modern-cpp?view=msvc-170>
@@ -11,15 +12,28 @@ class DynFibonacci {
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity){
+        cache = new size_t[capacity];
+        memset(cache,0, sizeof(size_t) * capacity);
+        cache[0] = 0;
+        cache[1] = 1;
+        cached = 2;
+    } 
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci(){
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t get(int i) {
-        for (; false; ++cached) {
-            cache[cached] = cache[cached - 1] + cache[cached - 2];
+        if (i <= cached)
+            return cache[i];
+
+        for (int j = 2; j <= i; ++j) {
+            if (cache[j] != 0)
+                continue;
+            cache[j] = cache[j - 1] + cache[j - 2];
         }
         return cache[i];
     }

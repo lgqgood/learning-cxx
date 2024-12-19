@@ -3,6 +3,8 @@ set_encodings("utf-8")
 set_warnings("all")
 set_kind("binary")
 set_languages("cxx17")
+set_symbols("debug") -- 设置符号级别为 debug
+add_cflags("-g", "-O0") -- 添加编译器标志
 
 -- 格式化输出
 target("exercise00")
@@ -39,7 +41,7 @@ target("exercise07")
 -- 指针
 target("exercise08")
     add_files("08_pointer/main.cpp")
-
+   
 -- 枚举/联合体
 target("exercise09")
     add_files("09_enum&union/main.cpp")

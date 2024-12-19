@@ -1,4 +1,5 @@
 #include "../exercise.h"
+#include <cstring>
 
 // READ: 左值右值（概念）<https://learn.microsoft.com/zh-cn/cpp/c-language/l-value-and-r-value-expressions?view=msvc-170>
 // READ: 左值右值（细节）<https://zh.cppreference.com/w/cpp/language/value_category>
@@ -12,26 +13,65 @@
 class DynFibonacci {
     size_t *cache;
     int cached;
+    int capacity;
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity){
+        cache = new size_t[capacity];
+        memset(cache, 0, sizeof(size_t) * capacity);
+        cache[0] = 0;
+        cache[1] = 1;
+        cached = 2;
+        this->capacity=capacity;
+    }
 
     // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci &&) noexcept = delete;
+    DynFibonacci(DynFibonacci && other){
+        this->cache = other.cache;
+        this->cached = other.cached;
+        this->capacity= other.capacity;
+        other.cache = nullptr;
+        other.cached = 0;
+        other.capacity = 0;
+    }
 
     // TODO: 实现移动赋值
     // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci &&) noexcept = delete;
+    DynFibonacci &operator=(DynFibonacci && other)
+    {
+        if (this != &other) {
+            if (cache != nullptr)
+               delete[] cache;
+            this->cache = other.cache;
+            this->cached = other.cached;
+            this->capacity= other.capacity;
+
+            other.cache = nullptr; // 设置原对象为空指针
+            other.cached = 0;
+            other.capacity = 0;
+        }
+        return *this;
+    } 
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci(){
+        if (cache != nullptr)
+            delete[] cache;
+        cache = nullptr;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
-        for (; false; ++cached) {
-            cache[cached] = cache[cached - 1] + cache[cached - 2];
+         if (i <= cached)
+            return cache[i];
+
+        for (int j = 2; j <= i; ++j) {
+            if (cache[j] != 0)
+                continue;
+            cache[j] = cache[j - 1] + cache[j - 2];
         }
+        this->cached = i;
         return cache[i];
     }
 
@@ -59,7 +99,7 @@ int main(int argc, char **argv) {
     DynFibonacci fib1(12);
 
     fib0 = std::move(fib1);
-    fib0 = std::move(fib0);
+    //fib0 = std::move(fib0);
     ASSERT(fib0[10] == 55, "fibonacci(10) should be 55");
 
     return 0;
